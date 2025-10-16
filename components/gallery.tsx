@@ -15,7 +15,7 @@ const galleryImages = [
     category: "Chrome Delete",
   },
   {
-    src: "https://i.ibb.co/fzqbx8FM/Fd9axep.png",
+    src: "https://i.ibb.co/fzqbx8FM/Fd9axep.pdng",
     title: "Custom Motorcycle",
     category: "Custom Graphics",
   },
