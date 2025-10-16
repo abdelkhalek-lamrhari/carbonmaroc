@@ -25,7 +25,7 @@ const galleryImages = [
     category: "Full Wrap",
   },
   {
-    src: " https://i.imgur.com/KXSY01F.gif",
+    src: "https://i.ibb.co/jkF0zZMY/KXSY01-F-1.gif",
     title: "LED Ambient Lighting",
     category: "Interior Customization",
   },
