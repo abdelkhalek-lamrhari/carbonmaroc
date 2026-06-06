@@ -3,71 +3,80 @@
 import type React from "react"
 
 import { useState } from "react"
+import Link from "next/link"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { X } from "lucide-react"
+import { supabase } from "@/lib/supabase/client"
+import { CAR_TYPE_OPTIONS, FINISH_OPTIONS, type QuoteRequestInsert } from "@/lib/supabase/types"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 interface QuoteFormModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
+const emptyForm = {
+  name: "",
+  email: "",
+  phone: "",
+  carModel: "",
+  carType: "",
+  finish: "",
+  color: "",
+  message: "",
+}
+
 export function QuoteFormModal({ isOpen, onClose }: QuoteFormModalProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    carModel: "",
-    serviceType: "",
-    message: "",
-  })
+  const { d } = useLanguage()
+  const m = d.modal
+  const [formData, setFormData] = useState(emptyForm)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setSubmitError(null)
 
     try {
-      console.log("[v0] Submitting quote form:", formData)
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-      const response = await fetch("/api/quote", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-      console.log("[v0] Quote submission response:", data)
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to submit quote request")
+      const payload: QuoteRequestInsert = {
+        user_id: user?.id ?? null,
+        contact_name: formData.name.trim(),
+        contact_phone: formData.phone.trim(),
+        contact_email: formData.email.trim() || null,
+        car_model: formData.carModel.trim(),
+        car_type: formData.carType as QuoteRequestInsert["car_type"],
+        color_requested: formData.color.trim(),
+        finish: formData.finish as QuoteRequestInsert["finish"],
+        notes: formData.message.trim() || null,
       }
 
-      alert("Quote request received! We'll contact you soon.")
+      const { error } = await supabase.from("quote_requests").insert(payload)
+      if (error) throw error
+
+      toast.success(m.success)
       onClose()
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        carModel: "",
-        serviceType: "",
-        message: "",
-      })
+      setFormData(emptyForm)
     } catch (error) {
-      console.error("[v0] Error submitting quote:", error)
-      setSubmitError("Failed to submit. Please try contacting us directly via WhatsApp.")
+      console.error("[quote-modal] submit error:", error)
+      toast.error(m.error)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   if (!isOpen) return null
+
+  const inputClass =
+    "bg-black/50 border-2 border-primary/30 focus:border-primary text-white placeholder:text-gray-600 h-12"
+  const selectClass = "w-full bg-black/50 border-2 border-primary/30 focus:border-primary text-white h-12 px-4 rounded-md"
+  const labelClass = "text-white font-display text-lg tracking-wider"
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -87,9 +96,9 @@ export function QuoteFormModal({ isOpen, onClose }: QuoteFormModalProps) {
         {/* Header */}
         <div className="bg-primary/10 border-b-4 border-primary/30 p-6 md:p-8">
           <h2 className="font-display text-4xl md:text-5xl text-white tracking-wider transform -rotate-1">
-            GET YOUR <span className="text-primary neon-text">QUOTE</span>
+            {m.title1} <span className="text-primary neon-text">{m.title2}</span>
           </h2>
-          <p className="text-gray-400 mt-2 text-sm md:text-base">Fill out the form and we'll get back to you ASAP</p>
+          <p className="text-gray-400 mt-2 text-sm md:text-base">{m.subtitle}</p>
         </div>
 
         {/* Form */}
@@ -97,121 +106,86 @@ export function QuoteFormModal({ isOpen, onClose }: QuoteFormModalProps) {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-white font-display text-lg tracking-wider">
-                NAME *
-              </Label>
-              <Input
-                id="name"
-                required
-                value={formData.name}
+              <Label htmlFor="name" className={labelClass}>{m.name} *</Label>
+              <Input id="name" required value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-black/50 border-2 border-primary/30 focus:border-primary text-white placeholder:text-gray-600 h-12"
-                placeholder="Your name"
-              />
+                className={inputClass} placeholder={m.namePh} />
             </div>
 
             {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white font-display text-lg tracking-wider">
-                EMAIL *
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={formData.email}
+              <Label htmlFor="email" className={labelClass}>{m.email}</Label>
+              <Input id="email" type="email" value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="bg-black/50 border-2 border-primary/30 focus:border-primary text-white placeholder:text-gray-600 h-12"
-                placeholder="your@email.com"
-              />
+                className={inputClass} placeholder="your@email.com" />
             </div>
 
             {/* Phone */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-white font-display text-lg tracking-wider">
-                PHONE *
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                required
-                value={formData.phone}
+              <Label htmlFor="phone" className={labelClass}>{m.phone} *</Label>
+              <Input id="phone" type="tel" required value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="bg-black/50 border-2 border-primary/30 focus:border-primary text-white placeholder:text-gray-600 h-12"
-                placeholder="+212 XXX XXX XXX"
-              />
+                className={inputClass} placeholder="0649454288" />
             </div>
 
             {/* Car Model */}
             <div className="space-y-2">
-              <Label htmlFor="carModel" className="text-white font-display text-lg tracking-wider">
-                CAR MODEL *
-              </Label>
-              <Input
-                id="carModel"
-                required
-                value={formData.carModel}
+              <Label htmlFor="carModel" className={labelClass}>{m.carModel} *</Label>
+              <Input id="carModel" required value={formData.carModel}
                 onChange={(e) => setFormData({ ...formData, carModel: e.target.value })}
-                className="bg-black/50 border-2 border-primary/30 focus:border-primary text-white placeholder:text-gray-600 h-12"
-                placeholder="e.g., Golf 8 GTD"
-              />
+                className={inputClass} placeholder={m.carModelPh} />
+            </div>
+
+            {/* Car Type */}
+            <div className="space-y-2">
+              <Label htmlFor="carType" className={labelClass}>{m.carType} *</Label>
+              <select id="carType" required value={formData.carType}
+                onChange={(e) => setFormData({ ...formData, carType: e.target.value })} className={selectClass}>
+                <option value="">{m.select}</option>
+                {CAR_TYPE_OPTIONS.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+              </select>
+            </div>
+
+            {/* Finish */}
+            <div className="space-y-2">
+              <Label htmlFor="finish" className={labelClass}>{m.finish} *</Label>
+              <select id="finish" required value={formData.finish}
+                onChange={(e) => setFormData({ ...formData, finish: e.target.value })} className={selectClass}>
+                <option value="">{m.select}</option>
+                {FINISH_OPTIONS.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+              </select>
             </div>
           </div>
 
-          {/* Service Type */}
+          {/* Color */}
           <div className="space-y-2">
-            <Label htmlFor="serviceType" className="text-white font-display text-lg tracking-wider">
-              SERVICE TYPE *
-            </Label>
-            <select
-              id="serviceType"
-              required
-              value={formData.serviceType}
-              onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-              className="w-full bg-black/50 border-2 border-primary/30 focus:border-primary text-white h-12 px-4 rounded-md"
-            >
-              <option value="">Select a service</option>
-              <option value="carbon-wrap">Carbon Fiber Wrapping</option>
-              <option value="full-wrap">Full Wrap</option>
-              <option value="performance-tuning">Performance Tuning</option>
-              <option value="detailing">Detailing & Protection</option>
-              <option value="custom-paint">Custom Paint Job</option>
-              <option value="wheels">Wheel & Tire Services</option>
-              <option value="interior">Interior Customization</option>
-              <option value="led-ambient">LED Ambient Lighting</option>
-              <option value="other">Other</option>
-            </select>
+            <Label htmlFor="color" className={labelClass}>{m.color} *</Label>
+            <Input id="color" required value={formData.color}
+              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+              className={inputClass} placeholder={m.colorPh} />
           </div>
 
           {/* Message */}
           <div className="space-y-2">
-            <Label htmlFor="message" className="text-white font-display text-lg tracking-wider">
-              MESSAGE
-            </Label>
-            <Textarea
-              id="message"
-              value={formData.message}
+            <Label htmlFor="message" className={labelClass}>{m.message}</Label>
+            <Textarea id="message" value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               className="bg-black/50 border-2 border-primary/30 focus:border-primary text-white placeholder:text-gray-600 min-h-[120px] resize-none"
-              placeholder="Tell us more about your project..."
-            />
+              placeholder={m.messagePh} />
           </div>
 
-          {submitError && (
-            <div className="bg-red-500/10 border-2 border-red-500/50 text-red-400 p-4 rounded-md text-sm">
-              {submitError}
-            </div>
-          )}
-
           {/* Submit Button */}
-          <Button
-            type="submit"
-            size="lg"
-            disabled={isSubmitting}
-            className="w-full font-display tracking-[0.2em] text-xl py-6 bg-primary hover:bg-primary/90 text-black border-4 border-primary transform hover:scale-105 transition-all shadow-[0_0_30px_rgba(var(--primary),0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {isSubmitting ? "SUBMITTING..." : "SUBMIT QUOTE REQUEST"}
+          <Button type="submit" size="lg" disabled={isSubmitting}
+            className="w-full font-display tracking-[0.2em] text-xl py-6 bg-primary hover:bg-primary/90 text-black border-4 border-primary transform hover:scale-105 transition-all shadow-[0_0_30px_rgba(var(--primary),0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+            {isSubmitting ? m.submitting : m.submit}
           </Button>
+
+          <p className="text-center text-sm text-gray-500">
+            {m.photoHint}{" "}
+            <Link href="/devis" onClick={onClose} className="text-primary hover:underline">
+              {m.photoLink}
+            </Link>
+          </p>
         </form>
       </div>
     </div>

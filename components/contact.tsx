@@ -1,7 +1,9 @@
 "use client"
 import { MapPin, Phone, Instagram, MessageCircle } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 export function Contact() {
+  const { d } = useLanguage()
   return (
     <section id="contact" className="py-20 md:py-32 relative overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-20" />
@@ -13,12 +15,12 @@ export function Contact() {
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="text-center space-y-4 md:space-y-6 mb-16 md:mb-20">
           <div className="inline-block px-4 md:px-6 py-2 bg-primary/10 border border-primary/30">
-            <span className="font-display text-primary text-xs md:text-sm tracking-widest">GET IN TOUCH</span>
+            <span className="font-display text-primary text-xs md:text-sm tracking-widest">{d.contact.badge}</span>
           </div>
           <h2 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">
-            CONTACT US
+            {d.contact.title}
           </h2>
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">Ready to transform your ride? Hit us up.</p>
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">{d.contact.subtitle}</p>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
@@ -29,7 +31,7 @@ export function Contact() {
                 <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-[#25D366]" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">WHATSAPP</h3>
+                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">{d.contact.whatsapp}</h3>
                 <p className="text-gray-400 text-lg md:text-xl truncate">0604-393431</p>
               </div>
               <div className="text-primary text-xl md:text-2xl opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -45,7 +47,7 @@ export function Contact() {
                 <Phone className="w-6 h-6 md:w-8 md:h-8 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">CALL US</h3>
+                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">{d.contact.callUs}</h3>
                 <p className="text-gray-400 text-lg md:text-xl truncate">+212 609 544 774</p>
               </div>
               <div className="text-primary text-xl md:text-2xl opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -60,7 +62,7 @@ export function Contact() {
                 <Phone className="w-6 h-6 md:w-8 md:h-8 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">CALL US</h3>
+                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">{d.contact.callUs}</h3>
                 <p className="text-gray-400 text-lg md:text-xl truncate">☎️ +212 620 050 948</p>
               </div>
               <div className="text-primary text-xl md:text-2xl opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -76,7 +78,7 @@ export function Contact() {
                 <Instagram className="w-6 h-6 md:w-8 md:h-8 text-[#E4405F]" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">INSTAGRAM</h3>
+                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">{d.contact.instagram}</h3>
                 <p className="text-gray-400 text-lg md:text-xl truncate">@carbonmaroc</p>
               </div>
               <div className="text-[#E4405F] text-xl md:text-2xl opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -97,8 +99,8 @@ export function Contact() {
                 <MapPin className="w-6 h-6 md:w-8 md:h-8 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">LOCATION</h3>
-                <p className="text-gray-400 text-lg md:text-xl">Casablanca, Morocco</p>
+                <h3 className="font-display text-2xl md:text-3xl mb-1 tracking-wider">{d.contact.location}</h3>
+                <p className="text-gray-400 text-lg md:text-xl">{d.contact.locationValue}</p>
               </div>
               <div className="text-primary text-xl md:text-2xl opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                 →

@@ -1,13 +1,17 @@
+"use client"
+
 import { Instagram, Facebook, Youtube, Mail, Phone } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 export function Footer() {
+  const { d } = useLanguage()
   return (
     <footer className="relative border-t border-primary/20 bg-black/80 backdrop-blur-sm overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-10" />
 
       <div className="absolute bottom-0 right-0 w-[600px] h-[400px] opacity-10 pointer-events-none">
         <img
-          src="/images/design-mode/ChatGPT%20Image%20Oct%2011%2C%202025%2C%2008_29_53%20PM.png"
+          src="/images/design-mode/showcase-car.png"
           alt=""
           className="w-full h-full object-contain object-bottom-right"
         />
@@ -26,51 +30,47 @@ export function Footer() {
                 <span className="text-primary">MAROC</span>
               </div>
             </div>
-            <p className="text-gray-400 leading-relaxed text-sm md:text-base">
-              Premium car wrapping and customization in Casablanca. Transform your ride into art.
-            </p>
+            <p className="text-gray-400 leading-relaxed text-sm md:text-base">{d.footer.tagline}</p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4 md:space-y-6">
-            <h3 className="font-display text-lg md:text-xl tracking-wider text-white">QUICK LINKS</h3>
+            <h3 className="font-display text-lg md:text-xl tracking-wider text-white">{d.footer.quickLinks}</h3>
             <ul className="space-y-2 md:space-y-3 text-gray-400 text-sm md:text-base">
               <li>
-                <a href="#services" className="hover:text-primary transition-colors animated-underline">
-                  Services
+                <a href="/#services" className="hover:text-primary transition-colors animated-underline">
+                  {d.nav.services}
                 </a>
               </li>
               <li>
-                <a href="#gallery" className="hover:text-primary transition-colors animated-underline">
-                  Gallery
+                <a href="/realisations" className="hover:text-primary transition-colors animated-underline">
+                  {d.nav.gallery}
                 </a>
               </li>
               <li>
-                <a href="#about" className="hover:text-primary transition-colors animated-underline">
-                  About
+                <a href="/#about" className="hover:text-primary transition-colors animated-underline">
+                  {d.nav.about}
                 </a>
               </li>
               <li>
-                <a href="#contact" className="hover:text-primary transition-colors animated-underline">
-                  Contact
+                <a href="/#contact" className="hover:text-primary transition-colors animated-underline">
+                  {d.nav.contact}
                 </a>
               </li>
             </ul>
           </div>
 
           <div className="space-y-4 md:space-y-6">
-            <h3 className="font-display text-lg md:text-xl tracking-wider text-white">SERVICES</h3>
+            <h3 className="font-display text-lg md:text-xl tracking-wider text-white">{d.footer.services}</h3>
             <ul className="space-y-2 md:space-y-3 text-gray-400 text-sm md:text-base">
-              <li>Full Wraps</li>
-              <li>Custom Graphics</li>
-              <li>Paint Protection</li>
-              <li>Chrome Delete</li>
-              <li>Ceramic Coating</li>
+              {d.footer.servicesList.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
             </ul>
           </div>
 
           <div className="space-y-4 md:space-y-6">
-            <h3 className="font-display text-lg md:text-xl tracking-wider text-white">CONNECT</h3>
+            <h3 className="font-display text-lg md:text-xl tracking-wider text-white">{d.footer.connect}</h3>
             <div className="space-y-3 md:space-y-4 text-gray-400 text-sm md:text-base">
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
@@ -108,9 +108,9 @@ export function Footer() {
 
         <div className="pt-6 md:pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-gray-400 text-sm md:text-base">
           <p className="text-center md:text-left">
-            &copy; {new Date().getFullYear()} Carbon Maroc. All rights reserved.
+            &copy; {new Date().getFullYear()} Carbon Maroc. {d.footer.rights}
           </p>
-          <p className="text-xs md:text-sm text-center md:text-right">Designed for the streets of Casa Blanca</p>
+          <p className="text-xs md:text-sm text-center md:text-right">{d.footer.designedFor}</p>
         </div>
       </div>
     </footer>

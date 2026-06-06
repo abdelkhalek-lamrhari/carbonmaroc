@@ -1,14 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
-import { QuoteFormModal } from "@/components/quote-form-modal"
+import { Menu, X, User } from "lucide-react"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useLanguage } from "@/lib/i18n/language-context"
+import { useAuth } from "@/lib/supabase/auth-context"
 
 export function Navigation() {
+  const { d } = useLanguage()
+  const { user } = useAuth()
+  const accountHref = user ? "/mon-compte" : "/login"
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,10 +24,12 @@ export function Navigation() {
   }, [])
 
   const navLinks = [
-    { href: "#services", label: "SERVICES" },
-    { href: "#gallery", label: "GALLERY" },
-    { href: "#about", label: "ABOUT" },
-    { href: "#contact", label: "CONTACT" },
+    { href: "#services", label: d.nav.services },
+    { href: "#gallery", label: d.nav.gallery },
+    { href: "/devis", label: d.nav.devis },
+    { href: "/rendez-vous", label: d.nav.rdv },
+    { href: "#about", label: d.nav.about },
+    { href: "#contact", label: d.nav.contact },
   ]
 
   return (
@@ -56,13 +63,19 @@ export function Navigation() {
                   <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary group-hover:w-full transition-all duration-300" />
                 </a>
               ))}
-              <Button
-                size="lg"
-                onClick={() => setIsQuoteModalOpen(true)}
-                className="font-display tracking-[0.2em] text-lg px-8 py-6 bg-primary hover:bg-primary/90 text-black border-4 border-primary transform rotate-2 hover:rotate-0 hover:scale-110 transition-all shadow-[0_0_20px_rgba(var(--primary),0.3)]"
-              >
-                GET QUOTE
-              </Button>
+              <LanguageSwitcher />
+              <Link href={accountHref} aria-label="Mon compte"
+                className="text-gray-300 hover:text-primary transition-colors border-2 border-primary/30 hover:border-primary p-2.5">
+                <User className="w-5 h-5" strokeWidth={2.5} />
+              </Link>
+              <Link href="/devis">
+                <Button
+                  size="lg"
+                  className="font-display tracking-[0.2em] text-lg px-8 py-6 bg-primary hover:bg-primary/90 text-black border-4 border-primary transform rotate-2 hover:rotate-0 hover:scale-110 transition-all shadow-[0_0_20px_rgba(var(--primary),0.3)]"
+                >
+                  {d.nav.getQuote}
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -88,24 +101,24 @@ export function Navigation() {
                     {link.label}
                   </a>
                 ))}
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    setIsQuoteModalOpen(true)
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full font-display tracking-[0.2em] text-lg py-6 bg-primary hover:bg-primary/90 text-black border-4 border-primary"
-                >
-                  GET QUOTE
-                </Button>
+                <Link href="/devis" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+                  <Button
+                    size="lg"
+                    className="w-full font-display tracking-[0.2em] text-lg py-6 bg-primary hover:bg-primary/90 text-black border-4 border-primary"
+                  >
+                    {d.nav.getQuote}
+                  </Button>
+                </Link>
+                <Link href={accountHref} onClick={() => setIsMobileMenuOpen(false)}
+                  className="font-display text-2xl text-gray-300 hover:text-primary transition-colors flex items-center gap-2">
+                  <User size={24} strokeWidth={3} /> {user ? "MON COMPTE" : "CONNEXION"}
+                </Link>
+                <LanguageSwitcher className="w-fit" />
               </div>
             </div>
           )}
         </div>
       </nav>
-
-      {/* Quote Form Modal */}
-      <QuoteFormModal isOpen={isQuoteModalOpen} onClose={() => setIsQuoteModalOpen(false)} />
     </>
   )
 }

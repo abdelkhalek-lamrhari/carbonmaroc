@@ -3,7 +3,10 @@ import type { Metadata } from "next"
 import { Bebas_Neue, Urbanist, Rye } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
-import { ChatbaseWidget } from "@/components/chatbase-widget"
+import { FloatingChat } from "@/components/chat/floating-chat"
+import { Toaster } from "@/components/ui/sonner"
+import { LanguageProvider } from "@/lib/i18n/language-context"
+import { AuthProvider } from "@/lib/supabase/auth-context"
 import "./globals.css"
 
 const bebasNeue = Bebas_Neue({
@@ -36,10 +39,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="fr" className="dark">
       <body className={`${urbanist.variable} ${bebasNeue.variable} ${oldStar.variable} font-sans antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
-        <ChatbaseWidget />
+        <AuthProvider>
+          <LanguageProvider>
+            <Suspense fallback={null}>{children}</Suspense>
+            <Toaster position="top-center" richColors />
+            <FloatingChat />
+          </LanguageProvider>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

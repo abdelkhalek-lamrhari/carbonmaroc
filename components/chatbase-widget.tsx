@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 interface Message {
   role: "user" | "assistant"
@@ -12,11 +13,12 @@ interface Message {
 }
 
 export function ChatbaseWidget() {
+  const { d } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Yo! Welcome to Carbon Maroc. How can I help you with your ride today?",
+      content: d.chat.greeting,
     },
   ])
   const [input, setInput] = useState("")
@@ -71,7 +73,7 @@ export function ChatbaseWidget() {
         ...prev,
         {
           role: "assistant",
-          content: "Yo, something went wrong. Hit us up on WhatsApp at 0604-393431 instead!",
+          content: d.chat.errorFallback,
         },
       ])
     } finally {
@@ -195,7 +197,7 @@ export function ChatbaseWidget() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about our services..."
+                placeholder={d.chat.placeholder}
                 className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-primary"
                 disabled={isLoading}
               />

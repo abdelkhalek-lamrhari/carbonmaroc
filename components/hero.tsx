@@ -3,8 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
+import Link from "next/link"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 export function Hero() {
+  const { d } = useLanguage()
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
@@ -30,7 +33,7 @@ export function Hero() {
 
       <div className="absolute -bottom-5 -right-5 md:-bottom-10 md:-right-10 w-[80%] sm:w-[60%] md:w-[50%] lg:w-[45%] h-[40%] sm:h-[50%] md:h-[60%] z-20 offset-image">
         <img
-          src="/images/design-mode/ChatGPT%20Image%20Oct%2011%2C%202025%2C%2008_29_53%20PM.png"
+          src="/images/design-mode/showcase-car.png"
           alt="Featured Car"
           className="w-full h-full object-contain object-bottom"
           style={{ transform: `translateX(${scrollY * 0.1}px)` }}
@@ -55,39 +58,43 @@ export function Hero() {
 
             <div className="inline-block transform -rotate-2 bg-primary/20 border-l-4 border-primary px-4 py-3 md:px-6 md:py-4 backdrop-blur-sm ml-2 md:ml-4">
               <p className="text-base sm:text-xl md:text-2xl text-white font-bold tracking-wide">
-                PRECISION × PASSION × POWER
+                {d.hero.tagline}
               </p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 items-start">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 font-display tracking-[0.2em] bg-primary hover:bg-primary/90 text-black border-4 border-primary aggressive-pulse transform hover:scale-105 transition-transform"
-            >
-              BOOK NOW
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full sm:w-auto text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 font-display tracking-[0.2em] border-4 border-white/40 hover:border-secondary hover:bg-secondary/20 transition-all bg-transparent transform hover:-rotate-1"
-            >
-              GALLERY
-            </Button>
+            <Link href="/rendez-vous" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 font-display tracking-[0.2em] bg-primary hover:bg-primary/90 text-black border-4 border-primary aggressive-pulse transform hover:scale-105 transition-transform"
+              >
+                {d.hero.bookNow}
+              </Button>
+            </Link>
+            <a href="#gallery" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 font-display tracking-[0.2em] border-4 border-white/40 hover:border-secondary hover:bg-secondary/20 transition-all bg-transparent transform hover:-rotate-1"
+              >
+                {d.hero.gallery}
+              </Button>
+            </a>
           </div>
 
           <div className="flex flex-wrap gap-6 md:gap-8 pt-8">
             <div className="transform rotate-2">
               <div className="text-4xl md:text-5xl font-display text-primary neon-text">500+</div>
-              <div className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Projects</div>
+              <div className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">{d.hero.statProjects}</div>
             </div>
             <div className="transform -rotate-1">
               <div className="text-4xl md:text-5xl font-display text-secondary neon-text">10+</div>
-              <div className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Years</div>
+              <div className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">{d.hero.statYears}</div>
             </div>
             <div className="transform rotate-1">
               <div className="text-4xl md:text-5xl font-display text-accent neon-text">100%</div>
-              <div className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Quality</div>
+              <div className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">{d.hero.statQuality}</div>
             </div>
           </div>
         </div>

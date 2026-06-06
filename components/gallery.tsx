@@ -1,9 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Link from "next/link"
 import { X } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/language-context"
+import { supabase } from "@/lib/supabase/client"
+import { finishLabel, type Project } from "@/lib/supabase/types"
 
-const galleryImages = [
+type GalleryItem = { src: string; title: string; category: string }
+
+// Fallback used only if the database returns nothing / errors.
+const galleryImages: GalleryItem[] = [
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%20Oct%2011%2C%202025%2C%2008_29_53%20PM-hUejUq3d0nXaaKAyF0L9FSekPmL4Ig.png",
     title: "Audi Quattro Custom Wrap",
@@ -42,12 +49,39 @@ const galleryImages = [
 ]
 
 export function Gallery() {
+  const { d } = useLanguage()
   const [activeFilter, setActiveFilter] = useState("All")
   const [lightboxImage, setLightboxImage] = useState<number | null>(null)
-  const filters = ["All", "Full Wrap", "Chrome Delete", "Custom Graphics", "Interior Customization"]
+  const [projects, setProjects] = useState<Project[] | null>(null)
 
-  const filteredImages =
-    activeFilter === "All" ? galleryImages : galleryImages.filter((img) => img.category === activeFilter)
+  // Fetch published projects from Supabase; fall back to the static list if empty/error.
+  useEffect(() => {
+    supabase
+      .from("projects")
+      .select("id, title, image_url, finish, car_type")
+      .eq("is_published", true)
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        setProjects(!error && data ? (data as Project[]) : [])
+      })
+  }, [])
+
+  const usingDb = !!projects && projects.length > 0
+  const items: GalleryItem[] = usingDb
+    ? projects!.map((p) => ({ src: p.image_url || "/placeholder.svg", title: p.title, category: p.finish }))
+    : galleryImages
+
+  // Display labels: DB → finish labels; fallback → translated category labels.
+  const labelFor = (cat: string) => (usingDb ? finishLabel(cat) : d.gallery.categories[cat] ?? cat)
+  const filterLabel = (key: string) => (key === "All" ? d.gallery.filterAll : labelFor(key))
+  const catLabel = (cat: string) => labelFor(cat)
+
+  const filters = usingDb
+    ? ["All", ...Array.from(new Set(projects!.map((p) => p.finish)))]
+    : ["All", "Full Wrap", "Chrome Delete", "Custom Graphics", "Interior Customization"]
+
+  const filteredImages = activeFilter === "All" ? items : items.filter((img) => img.category === activeFilter)
 
   const openLightbox = (index: number) => setLightboxImage(index)
   const closeLightbox = () => setLightboxImage(null)
@@ -65,13 +99,13 @@ export function Gallery() {
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="mb-16 md:mb-24 space-y-6 md:space-y-8">
           <div className="inline-block transform rotate-2 px-6 md:px-8 py-2 md:py-3 bg-secondary/10 border-r-4 md:border-r-8 border-secondary">
-            <span className="font-display text-secondary text-sm md:text-lg tracking-[0.3em]">OUR WORK</span>
+            <span className="font-display text-secondary text-sm md:text-lg tracking-[0.3em]">{d.gallery.badge}</span>
           </div>
           <h2 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tight leading-none">
-            <span className="block text-white transform -rotate-1 inline-block">GALLERY</span>
+            <span className="block text-white transform -rotate-1 inline-block">{d.gallery.title}</span>
           </h2>
           <p className="text-lg md:text-2xl text-gray-400 max-w-2xl transform rotate-1 inline-block ml-4 md:ml-8">
-            Check out some of our recent transformations
+            {d.gallery.subtitle}
           </p>
         </div>
 
@@ -88,7 +122,7 @@ export function Gallery() {
                   : "bg-white/5 text-gray-300 border-4 border-white/20 hover:border-primary/50"
               }`}
             >
-              {filter}
+              {filterLabel(filter)}
             </button>
           ))}
         </div>
@@ -115,7 +149,7 @@ export function Gallery() {
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform">
                   <div className="inline-block px-4 md:px-6 py-1 md:py-2 bg-primary border-4 border-primary mb-3 md:mb-4 transform -rotate-2">
                     <span className="font-display text-black text-xs md:text-sm tracking-[0.2em]">
-                      {image.category}
+                      {catLabel(image.category)}
                     </span>
                   </div>
                   <h3 className="font-display text-2xl md:text-4xl text-white transform rotate-1">{image.title}</h3>
@@ -123,6 +157,15 @@ export function Gallery() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-12 md:mt-16 flex justify-center">
+          <Link
+            href="/realisations"
+            className="inline-block font-display tracking-[0.2em] text-base md:text-lg px-8 md:px-10 py-4 md:py-5 bg-primary text-black border-4 border-primary transform -rotate-1 hover:rotate-0 hover:scale-105 transition-all shadow-[0_0_30px_rgba(var(--primary),0.4)]"
+          >
+            VOIR TOUTE LA GALERIE →
+          </Link>
         </div>
       </div>
 
@@ -182,7 +225,7 @@ export function Gallery() {
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-6 md:p-8">
               <div className="inline-block px-4 md:px-6 py-1 md:py-2 bg-primary border-4 border-primary mb-2 md:mb-3 transform -rotate-1">
                 <span className="font-display text-black text-xs md:text-sm tracking-[0.2em]">
-                  {filteredImages[lightboxImage].category}
+                  {catLabel(filteredImages[lightboxImage].category)}
                 </span>
               </div>
               <h3 className="font-display text-2xl md:text-5xl text-white transform rotate-1 inline-block">
